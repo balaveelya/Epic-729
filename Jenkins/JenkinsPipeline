@@ -34,10 +34,10 @@ node {
     
   
         stage (name: 'integration_test') {
-            dir ('math-inventory-test') { 
+            dir ('src') {
                 echo "Running integration tests ..."
                 mvnHome = tool name: 'maven3.5.4', type: 'hudson.tasks.Maven$MavenInstallation'
-                sh (script: "$mvnHome/bin/mvn gatling:test")
+                sh (script: "$mvnHome/bin/mvn gatling:execute")
             }
         }
         
