@@ -21,7 +21,7 @@
     <scala.version>2.11.8</scala.version>
     <scala.compat.version>2.11</scala.compat.version>
     <gatling.version>2.1.7</gatling.version>
-    <gatling-plugin.version>2.1.7</gatling-plugin.version>
+    <gatling-plugin.version>2.2.1</gatling-plugin.version>
   </properties>
 
   <dependencies>
@@ -115,7 +115,8 @@
         <artifactId>gatling-maven-plugin</artifactId>
         <version>${gatling-plugin.version}</version>
         <configuration>
-          <simulationClass>epic729.simulation.EpicSimulation</simulationClass>
+          <!--<simulationClass>epic729.simulation.EpicSimulation</simulationClass> -->
+          <simulationsFolder>src/test/scala</simulationsFolder>
           <jvmArgs>
             <jvmArg>-Denv=stable</jvmArg>
             <jvmArg>-Dusers=${users}</jvmArg>
