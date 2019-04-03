@@ -115,19 +115,22 @@
         <artifactId>gatling-maven-plugin</artifactId>
         <version>${gatling-plugin.version}</version>
         <configuration>
-          <simulationClass>epic729.simulation.EpicSimulation</simulationClass>
-            <jvmArgs>
-                <jvmArg>-Denv=stable</jvmArg>
-                <jvmArg>-Dusers=${users}</jvmArg>
-                <jvmArg>-Drampup=${rampup}</jvmArg>
-                <jvmArg>-Dduration=${duration}</jvmArg>
-                <jvmArg>-Dthroughput=${throughput}</jvmArg>
-                <jvmArg>-Xms2g</jvmArg>
-                <jvmArg>-Xmx5g</jvmArg>
-            </jvmArgs>
-            <!--<fork>true</fork>-->
-            <propagateSystemProperties>true</propagateSystemProperties>
+          <configFolder>${project.basedir}/src/test/scala/epic729</configFolder>
+          <dataFolder>${project.basedir}/src/test/scala/epic729/data</dataFolder>
+          <resultsFolder>${project.basedir}/target/gatling/results</resultsFolder>
+          <bodiesFolder>${project.basedir}/src/main/scala/bodies</bodiesFolder>
+          <simulationsFolder>${project.basedir}/src/test/scala</simulationsFolder>
+          <runDescription>Math Inventory Gatling Tests</runDescription>
         </configuration>
+        <executions>
+          <execution>
+            <id>Test</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>
