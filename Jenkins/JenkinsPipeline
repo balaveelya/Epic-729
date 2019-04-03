@@ -1,0 +1,109 @@
+node {
+    
+    def git_branch = 'master'
+    def app_name = 'math-inventory-api'
+    def scheduled_name = app_name
+   
+    
+    try {
+        
+        stage ('Checkout') {
+            git branch: git_branch, credentialsId: '66427afc-2571-4f67-b135-c9a4e6b50ca2', url: "${git_url}"
+    
+            version = getVersion().minus("-SNAPSHOT") + "." + "${currentBuild.displayName}" - "#"
+            
+            notifyBuild('STARTED')    
+            
+            if (version) {
+                currentBuild.displayName = version
+                echo "version: ${version}, build number: ${currentBuild.displayName}"
+            }
+        }
+    
+        stage ('Compile') {
+            mvnHome = tool name: 'maven3.5.4', type: 'hudson.tasks.Maven$MavenInstallation'    
+            echo "running unit tests"
+            
+            // assign dynamic port
+            testPort = assignAvailablePort()
+            
+            // use available port for mysql based integration/spring boot tests
+            sh (script: "$mvnHome/bin/mvn clean install  -Dbuild.number=$version -Dproject.version=$version")
+           
+        }
+    
+  
+        stage (name: 'integration_test') {
+            dir ('math-inventory-test') { 
+                echo "Running integration tests ..."
+                mvnHome = tool name: 'maven3.5.4', type: 'hudson.tasks.Maven$MavenInstallation'
+                sh (script: "$mvnHome/bin/mvn gatling:test")
+            }
+        }
+        
+        
+    } catch (e) {
+        // If there was an exception thrown, the build failed
+        currentBuild.result = "FAILED"
+        throw e
+    } finally {
+        // Success or failure, always send notifications
+        notifyBuild(currentBuild.result)
+    }
+}
+
+def getVersion() {
+    def fileContents = readFile("pom.xml")
+    def regex = /<version>(.+)<\/version>/
+    def m = fileContents =~ regex;
+    // read project version which is the first occurence of the version on the POM.
+    // if you have a parent pom, adjust array values below accordingly.
+    println m[0][1]
+    m[0][1].toString()
+}
+
+def notifyBuild(String buildStatus = 'STARTED') {
+  // build status of null means successful
+  buildStatus =  buildStatus ?: 'SUCCESSFUL'
+
+  // Default values
+  def colorName = 'RED'
+  def colorCode = '#FF0000'
+  def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]', version: ${version}"
+  def summary = "${subject} (${env.BUILD_URL})"
+  def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>"""
+
+  // Override default values based on build status
+  if (buildStatus == 'STARTED') {
+    color = 'YELLOW'
+    colorCode = '#FFFF00'
+  } else if (buildStatus == 'SUCCESSFUL') {
+    color = 'GREEN'
+    colorCode = '#00FF00'
+  } else {
+    color = 'RED'
+    colorCode = '#FF0000'
+  }
+
+  // Send notifications
+  slackSend (color: colorCode, message: summary)
+
+}
+
+@NonCPS
+def assignAvailablePort() {
+    def testPort = null
+    
+    try {
+        // get an available port
+        def serverSocket = new ServerSocket(0)
+        
+        testPort = serverSocket.getLocalPort()
+        
+    } catch (IOException ex) {
+        currentBuild.result = "FAILED"
+        throw ex
+    }
+}
+
