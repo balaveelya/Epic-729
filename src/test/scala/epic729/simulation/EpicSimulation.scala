@@ -11,7 +11,11 @@ import epic729.util.{Scenariotrait, SimulationTrait}
 
 class EpicSimulation extends  Simulation with SimulationTrait {
 
-  val userFeeder = createFeeder(Config.csvPath+"users_int.csv")
+  val prefix = s"users_${Config.TARGET_ENV}"+".csv"
+
+  val path = System.getProperty("user.dir")+"\\src\\test\\scala\\Epic729\\data\\"
+
+  val userFeeder = createFeeder(path+prefix)
 
   val epicScenario = scenario("Epic 729 API scenario").feed(userFeeder)
     .repeat(Config.iterations) {

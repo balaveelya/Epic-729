@@ -4,7 +4,7 @@ object Config {
 
   val httpUrl="https://math-inventory-api.staging0.hmheng-math-inventory.br.internal"
 
-  val csvPath = "D:\\iRead\\PerformanceTesting\\src\\test\\scala\\Epic729\\data\\"
+  //val csvPath = "D:\\iRead\\PerformanceTesting\\src\\test\\scala\\Epic729\\data\\"
 
   val BASE_URL = System.getProperty("base_url","")
   val COMMON_BASE_URL = java.lang.Boolean.getBoolean("common_base_url")
