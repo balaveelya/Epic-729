@@ -34,7 +34,7 @@ node {
     
   
         stage (name: 'integration_test') {
-            dir ('epic729') { 
+            dir ('epic-test') {
 
                 echo "Running integration tests ..."
                 mvnHome = tool name: 'maven3.5.4', type: 'hudson.tasks.Maven$MavenInstallation'
